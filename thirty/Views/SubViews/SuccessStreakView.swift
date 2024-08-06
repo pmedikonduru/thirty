@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SuccessStreakView: View {
-    let streak: Int
+    @ObservedObject var dataManager: DataManager
 
     var body: some View {
         VStack {
@@ -24,10 +24,10 @@ struct SuccessStreakView: View {
                 ForEach(1...30, id: \.self) { day in
                     ZStack {
                         Rectangle()
-                            .fill(day <= streak ? Color.green : Color.lightGrey)
+                            .fill(day <= dataManager.streak ? Color.green : Color.lightGrey)
                             .frame(width: 30, height: 30)
                             .cornerRadius(5)
-                        if day <= streak {
+                        if day <= dataManager.streak {
                             Text("\(day)")
                                 .font(.caption)
                                 .foregroundColor(.white)
@@ -37,7 +37,7 @@ struct SuccessStreakView: View {
             }
 
             HStack {
-                Text("\(streak) day streak 🔥")
+                Text("\(dataManager.streak) day streak 🔥")
                     .font(.caption)
                     .foregroundStyle(.lightGrey)
             }
@@ -49,9 +49,4 @@ struct SuccessStreakView: View {
                 .padding(.horizontal)
         )
     }
-}
-
-
-#Preview {
-    SuccessStreakView(streak: 30)
 }

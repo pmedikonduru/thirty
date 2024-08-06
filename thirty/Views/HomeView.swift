@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var dataManager = DataManager()
+    @ObservedObject var dataManager: DataManager
     
     var body: some View {
         NavigationView {
@@ -43,7 +43,7 @@ struct HomeView: View {
                         )
                         .padding(.bottom, 20)
                         
-                        SuccessStreakView(streak: dataManager.streak)
+                        SuccessStreakView(dataManager: dataManager) // Pass the dataManager here
                         
                         Spacer()
                     }
@@ -54,5 +54,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(dataManager: DataManager()) // Pass an instance of DataManager
 }

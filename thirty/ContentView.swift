@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var dataManager: DataManager
+    
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")

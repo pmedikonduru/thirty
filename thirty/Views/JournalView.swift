@@ -23,9 +23,9 @@ struct JournalView: View {
                     .ignoresSafeArea()
                 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack {
                         // Journal post writing form
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack {
                             Text("Write a Journal Post")
                                 .font(.headline)
                                 .foregroundStyle(.lightGrey)
@@ -37,10 +37,14 @@ struct JournalView: View {
                                 .frame(height: 100)
                                 .border(Color.gray, width: 1)
                             
-                            DatePicker("Select Date", selection: $selectedDate, displayedComponents: .date)
-                            
+                            HStack {
+                                Text("Date:")
+                                Spacer()
+                                Text("\(Date())")
+                            }
                             Button(action: {
                                 dataManager.addJournalPost(title: title, content: content, date: selectedDate, image: selectedImage, userProfileImage: userProfileImage, userName: userName)
+                                dataManager.streak += 1
                                 title = ""
                                 content = ""
                             }) {
@@ -64,17 +68,16 @@ struct JournalView: View {
                                     slides: post.slides,
                                     userProfileImage: post.userProfileImage,
                                     userName: post.userName,
-                                    postDate: post.date.formatted()
+                                    postDate: "\(post.date)"
                                 )) {
                                     VStack(alignment: .leading) {
                                         Text(post.title)
                                             .font(.headline)
-                                        Text("\(post.date, formatter: DateFormatter.shortDate)")
+                                        Text("\(post.date)")
                                             .font(.caption)
                                         Text(post.content)
                                             .font(.body)
                                             .lineLimit(3)
-
                                     }
                                     .padding()
                                     .background(Color.white.opacity(0.2))
@@ -89,15 +92,6 @@ struct JournalView: View {
             }
         }
     }
-}
-
-
-extension DateFormatter {
-    static let shortDate: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        return formatter
-    }()
 }
 
 #Preview {
