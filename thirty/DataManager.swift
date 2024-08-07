@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Combine
-import UIKit
 
 class DataManager: ObservableObject {
     @Published var journalPosts: [JournalPost] = []
@@ -15,13 +14,26 @@ class DataManager: ObservableObject {
     
     private var lastPostDate: Date?
     
-    func addJournalPost(title: String, content: String, date: Date, image: UIImage?, userProfileImage: String, userName: String) {
+    func addOrUpdateJournalPost(title: String, content: String, date: Date, image: UIImage?, userProfileImage: String, userName: String) {
         let newPost = JournalPost(title: title, content: content, date: date, image: image, userProfileImage: userProfileImage, userName: userName)
-        journalPosts.append(newPost)
+        
+        if let index = journalPosts.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
+            // Update existing post
+            journalPosts[index] = newPost
+        } else {
+            // Add new post
+            journalPosts.append(newPost)
+        }
+        
+        updateStreak(for: date)
+    }
+    
+    private func updateStreak(for date: Date) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: date)
         
         if let lastDate = lastPostDate {
-            let calendar = Calendar.current
-            let components = calendar.dateComponents([.day], from: lastDate, to: date)
+            let components = calendar.dateComponents([.day], from: lastDate, to: today)
             
             if let dayDifference = components.day, dayDifference <= 1 {
                 streak += 1
@@ -32,19 +44,52 @@ class DataManager: ObservableObject {
             streak = 1 // Initialize streak for the first post
         }
         
-        lastPostDate = date
+        lastPostDate = today
     }
     
-    func deletePost(at index: Int) {
-        journalPosts.remove(at: index)
-        // You might need to recalculate streak after deleting a post, depending on your logic
+    func deleteJournalPost(post: JournalPost) {
+        if let index = journalPosts.firstIndex(where: { $0.id == post.id }) {
+            journalPosts.remove(at: index)
+            // You might need to recalculate streak after deleting a post
+            recalculateStreak()
+        } else {
+            // Handle the case where the post is not found
+            print("Post not found in journalPosts")
+        }
+    }
+    
+    private func recalculateStreak() {
+        let calendar = Calendar.current
+        guard let lastDate = lastPostDate else {
+            streak = 0
+            return
+        }
+        
+        var currentStreak = 0
+        var currentDate = calendar.startOfDay(for: Date())
+        
+        while let lastPost = journalPosts.first(where: { calendar.isDate($0.date, inSameDayAs: currentDate) }) {
+            currentStreak += 1
+            currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
+        }
+        
+        streak = currentStreak
+    }
+    
+    func getTodaysJournalPost() -> JournalPost? {
+        guard !journalPosts.isEmpty else { return nil } // Check if there are any posts
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date()) // Get the start of today
+
+        return journalPosts.first(where: { calendar.isDate($0.date, inSameDayAs: today) })
     }
 }
 
 struct Slide: Identifiable {
-  let id = UUID() // Generate a unique identifier for each slide
-  var text: String?
-  var imageName: String?
+    let id = UUID() // Generate a unique identifier for each slide
+    var text: String?
+    var imageName: String?
 }
 
 struct JournalPost: Identifiable {
