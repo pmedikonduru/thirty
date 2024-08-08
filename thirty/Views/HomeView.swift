@@ -13,39 +13,24 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color.gray, Color.deepBlue]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color.deepBlue, Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
                     .ignoresSafeArea()
                 
-                ScrollView {
+                GeometryReader { geometry in
                     VStack {
-                        HStack {
-                            Text("Thirty")
-                                .font(.headline)
-                                .foregroundStyle(.lightGrey)
-                            Spacer()
-                            Button(action: {}) {
-                                Image(systemName: "heart")
-                                    .foregroundStyle(.lightGrey)
+                        ScrollView {
+                            VStack {
+                                HabitChallengeCardView(
+                                    title: "Habit challenge",
+                                    description: "benefits of habit blabh ablah balh ablha hlashdjfhaskdhflsakdjfhsadkjfhsladkfhaslkfhkdsafhsa"
+                                )
+                                .padding(.bottom, 20)
+                                
+                                SuccessStreakView(dataManager: dataManager) // Pass the dataManager here
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            Button(action: {}) {
-                                Image(systemName: "gear")
-                                    .foregroundStyle(.lightGrey)
-                            }
-                            .buttonStyle(PlainButtonStyle())
+                            .padding(.top, 50)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 30)
-                        
-                        HabitChallengeCardView(
-                            title: "Habit challenge",
-                            description: "benefits of habit blabh ablah balh ablha hlashdjfhaskdhflsakdjfhsadkjfhsladkfhaslkfhkdsafhsa"
-                        )
-                        .padding(.bottom, 20)
-                        
-                        SuccessStreakView(dataManager: dataManager) // Pass the dataManager here
-                        
-                        Spacer()
+                        .frame(height: geometry.size.height - 100) // Adjust the height to fit above the TabView
                     }
                 }
             }

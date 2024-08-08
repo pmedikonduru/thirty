@@ -14,7 +14,7 @@ class DataManager: ObservableObject {
     
     private var lastPostDate: Date?
     
-    func addOrUpdateJournalPost(title: String, content: String, date: Date, image: UIImage?, userProfileImage: String, userName: String) {
+    func addOrUpdateJournalPost(title: String, content: String, date: Date, image: UIImage?, userProfileImage: String, userName: String, isReplacement: Bool) {
         let newPost = JournalPost(title: title, content: content, date: date, image: image, userProfileImage: userProfileImage, userName: userName)
         
         if let index = journalPosts.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
@@ -23,9 +23,10 @@ class DataManager: ObservableObject {
         } else {
             // Add new post
             journalPosts.append(newPost)
+            if !isReplacement {
+                updateStreak(for: date)
+            }
         }
-        
-        updateStreak(for: date)
     }
     
     private func updateStreak(for date: Date) {
@@ -60,7 +61,7 @@ class DataManager: ObservableObject {
     
     private func recalculateStreak() {
         let calendar = Calendar.current
-        guard let lastDate = lastPostDate else {
+        guard lastPostDate != nil else {
             streak = 0
             return
         }
@@ -68,7 +69,7 @@ class DataManager: ObservableObject {
         var currentStreak = 0
         var currentDate = calendar.startOfDay(for: Date())
         
-        while let lastPost = journalPosts.first(where: { calendar.isDate($0.date, inSameDayAs: currentDate) }) {
+        while journalPosts.first(where: { calendar.isDate($0.date, inSameDayAs: currentDate) }) != nil {
             currentStreak += 1
             currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
         }

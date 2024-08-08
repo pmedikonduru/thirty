@@ -9,7 +9,17 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var dataManager: DataManager
-    
+
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.black // Set the desired tab bar color
+
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().unselectedItemTintColor = UIColor.lightGray
+    }
+
     var body: some View {
         TabView {
             HomeView(dataManager: dataManager)
@@ -17,22 +27,21 @@ struct ContentView: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
-            
-            JournalView()
+                .background(Color.blue.edgesIgnoringSafeArea(.all)) // HomeView background color
+
+            JournalView(dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "book")
                     Text("Journal")
                 }
-            
+                .background(Color.black.edgesIgnoringSafeArea(.all)) // JournalView background color
+
             ProfileView()
                 .tabItem {
                     Image(systemName: "person")
                     Text("Profile")
                 }
-        }
-        .accentColor(.lightGrey)
-        .onAppear {
-            UITabBar.appearance().unselectedItemTintColor = UIColor(.lightGrey)
+                .background(Color.gray.edgesIgnoringSafeArea(.all)) // ProfileView background color
         }
     }
 }
@@ -41,5 +50,3 @@ struct ContentView: View {
     ContentView()
         .environmentObject(DataManager())
 }
-
-
