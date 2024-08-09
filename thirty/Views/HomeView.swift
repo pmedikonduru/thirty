@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var dataManager: DataManager
+    @StateObject var viewModel = HomeViewModel()
     
     var body: some View {
         NavigationView {
@@ -20,17 +21,24 @@ struct HomeView: View {
                     VStack {
                         ScrollView {
                             VStack {
+                                Text("Hello, \(viewModel.name).")
+                                    .foregroundStyle(.white)
+                                    .bold()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal)
+                                
+                                
                                 HabitChallengeCardView(
                                     title: "Habit challenge",
                                     description: "benefits of habit blabh ablah balh ablha hlashdjfhaskdhflsakdjfhsadkjfhsladkfhaslkfhkdsafhsa"
                                 )
                                 .padding(.bottom, 20)
                                 
-                                SuccessStreakView(dataManager: dataManager) // Pass the dataManager here
+                                SuccessStreakView(dataManager: dataManager)
                             }
                             .padding(.top, 50)
                         }
-                        .frame(height: geometry.size.height - 100) // Adjust the height to fit above the TabView
+                        .frame(height: geometry.size.height - 100)
                     }
                 }
             }
@@ -39,5 +47,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(dataManager: DataManager()) // Pass an instance of DataManager
+    HomeView(dataManager: DataManager())
 }

@@ -9,9 +9,7 @@ import SwiftUI
 
 struct RegistrationView: View {
     
-    @State var email = ""
-    @State var password = ""
-    @State var name = ""
+    @StateObject var viewModel = RegisterViewModel()
     
     var body: some View {
         
@@ -36,20 +34,20 @@ struct RegistrationView: View {
                 
 
                 // Form Elements
-                TextField("Full Name", text: $name)
+                TextField("Full Name", text: $viewModel.name)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .background(Color.clear)
                 
-                TextField("Email Address", text: $email)
+                TextField("Email Address", text: $viewModel.email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .background(Color.clear)
                 
-                SecureField("Password", text: $password)
+                SecureField("Password", text: $viewModel.password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .background(Color.clear)
                 
                 Button {
-                    // Button action
+                    viewModel.register()
                 } label: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
@@ -63,9 +61,6 @@ struct RegistrationView: View {
                 }
                 .padding(.top, 5)
                 .padding(.bottom, 15)
-                
-                NavigationLink("Create An Account", destination: RegistrationView())
-                    .padding(.top, 15)
                 
                 Spacer()
             }

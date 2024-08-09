@@ -8,10 +8,8 @@
 import SwiftUI
 
 struct ProfileView: View {
-    
-    @State private var selectedGoal = "Be more present"
-    let goals = ["Be more present", "Improve fitness", "Learn a new skill", "Read more books"]
-    
+    @StateObject var viewModel = ProfileViewModel()
+
     var body: some View {
         ZStack {
             Color.black
@@ -23,142 +21,105 @@ struct ProfileView: View {
                         // Profile Section
                         Section(header: Text("PROFILE")
                             .foregroundColor(.white)) {
-                                Picker(selection: $selectedGoal, label: Text("goal").foregroundColor(.white)) {
-                                    ForEach(goals, id: \.self) { goal in
+                                Picker(selection: $viewModel.selectedGoal, label: Text("Goal").foregroundColor(.white)) {
+                                    ForEach(viewModel.goals, id: \.self) { goal in
                                         Text(goal).tag(goal)
+                                    }
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            .foregroundStyle(.white)
-                            
-                            NavigationLink(destination: Text("Accountability Partners")) {
-                                HStack {
-                                    Text("Accountabilty Partners")
-                                        .foregroundColor(.white)
-                                    Spacer()
-                                    Text("Set up")
-                                        .foregroundColor(.gray)
+                                .listRowBackground(Color.gray.opacity(0.2))
+                                .foregroundStyle(.white)
+                                
+                                NavigationLink(destination: Text("Accountability Partners")) {
+                                    HStack {
+                                        Text("Accountability Partners")
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                        Text("Set up")
+                                            .foregroundColor(.gray)
+                                    }
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
+                                .listRowBackground(Color.gray.opacity(0.2))
                         }
-                        
-                        // Spacer between sections
-                        .listRowBackground(Color.black)
-                        
+
                         // Account Section
                         Section(header: Text("ACCOUNT")
                             .foregroundColor(.white)) {
-                                NavigationLink(destination: Text("Premium")) {
-                                    HStack {
-                                        Text("Subscription")
-                                            .foregroundColor(.white)
-                                        Spacer()
-                                        Text("★ Go Premium")
-                                            .foregroundStyle(.blue)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: 5)
-                                                    .fill(.blue)
-                                                    .opacity(0.3) // Adjust opacity as needed
-                                            )
-                                    }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            
-                            HStack {
-                                Text("Display Name")
-                                    .foregroundColor(.white)
-                                Spacer()
-                                Text("Pranav")
-                                    .foregroundColor(.gray)
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            HStack {
-                                Text("Phone Number")
-                                    .foregroundColor(.white)
-                                Spacer()
-                                Text("737-318-1779")
-                                    .foregroundColor(.gray)
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                        }
-                        
-                        // Spacer between sections
-                        .listRowBackground(Color.black)
-                        
-                        // Help Section
-                        Section(header: Text("HELP")
-                            .foregroundColor(.white)) {
-                            NavigationLink(destination: Text("Call a Founder")) {
                                 HStack {
-                                    Text("Call a Founder")
+                                    Text("Display Name")
                                         .foregroundColor(.white)
                                     Spacer()
-                                    Image(systemName: "phone.fill")
-                                        .foregroundColor(.green)
+                                    Text(viewModel.displayName)
+                                        .foregroundColor(.gray)
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            NavigationLink(destination: Text("FAQs")) {
+                                .listRowBackground(Color.gray.opacity(0.2))
+                                
                                 HStack {
-                                    Text("FAQs")
+                                    Text("Phone Number")
                                         .foregroundColor(.white)
+                                    Spacer()
+                                    Text(viewModel.phoneNumber)
+                                        .foregroundColor(.gray)
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            NavigationLink(destination: Text("Feedback Form")) {
-                                HStack {
-                                    Text("Leave Us Feedback To Help Improve Thirty!")
-                                        .foregroundColor(.white)
-                                }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
+                                .listRowBackground(Color.gray.opacity(0.2))
                         }
-                        
-                        // Spacer between sections
-                        .listRowBackground(Color.black)
-                        
-                        // More Section
-                        Section(header: Text("SOCIAL")
-                            .foregroundColor(.white)) {
 
-                            NavigationLink(destination: Text("Leave a Review")) {
-                                HStack {
-                                    Text("Leave a Review")
+                        // Notifications Section
+                        Section(header: Text("NOTIFICATIONS")
+                            .foregroundColor(.white)) {
+                                Toggle(isOn: .constant(true)) {
+                                    Text("Receive Push Notifications")
                                         .foregroundColor(.white)
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            NavigationLink(destination: Text("Refer a Friend")) {
-                                HStack {
-                                    Text("Refer a Friend")
+                                .listRowBackground(Color.gray.opacity(0.2))
+
+                                Toggle(isOn: .constant(true)) {
+                                    Text("Receive Email Updates")
                                         .foregroundColor(.white)
                                 }
-                            }
-                            .listRowBackground(Color.gray.opacity(0.2))
+                                .listRowBackground(Color.gray.opacity(0.2))
                         }
-                        
-                        // Spacer between sections
-                        .listRowBackground(Color.black)
-                        
-                        //Sign out/Delete Account section
+
+                        // Subscription Section
+                        Section(header: Text("SUBSCRIPTION")
+                            .foregroundColor(.white)) {
+                                NavigationLink(destination: Text("Manage Subscription")) {
+                                    HStack {
+                                        Text("Manage Subscription")
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                        Text("Active")
+                                            .foregroundColor(.green)
+                                    }
+                                }
+                                .listRowBackground(Color.gray.opacity(0.2))
+                        }
+
+                        // Danger Zone Section
                         Section(header: Text("DANGER ZONE")
                             .foregroundColor(.white)) {
 
-                            NavigationLink(destination: Text("Sign Out")) {
+                            Button(action: {
+                                viewModel.signOut()
+                            }) {
                                 HStack {
                                     Text("Sign Out")
                                         .foregroundColor(.white)
                                 }
                             }
                             .listRowBackground(Color.gray.opacity(0.2))
-                            
-                            NavigationLink(destination: Text("Delete Account")) {
+
+                            Button(action: {
+                                viewModel.deleteAccount { result in
+                                    switch result {
+                                    case .success:
+                                        // Handle successful account deletion
+                                        print("Account deleted successfully")
+                                    case .failure(let error):
+                                        // Handle error
+                                        print("Failed to delete account: \(error.localizedDescription)")
+                                    }
+                                }
+                            }) {
                                 HStack {
                                     Text("Delete Account")
                                         .foregroundColor(.red)
@@ -166,10 +127,7 @@ struct ProfileView: View {
                             }
                             .listRowBackground(Color.gray.opacity(0.2))
                         }
-                        
-                        // Spacer between sections
-                        .listRowBackground(Color.black)
-                        
+
                         // Footer Section
                         VStack {
                             HStack {
@@ -192,12 +150,12 @@ struct ProfileView: View {
                         .listRowBackground(Color.black)
                     }
                     .listStyle(GroupedListStyle())
-                    .scrollContentBackground(.hidden) // Prevent content background color issues
-                    .foregroundColor(.white) // Ensure all text is white
+                    .scrollContentBackground(.hidden)
+                    .foregroundColor(.white)
                 }
                 .navigationTitle("Profile")
             }
-            .colorScheme(.dark) // Force dark mode
+            .colorScheme(.dark)
         }
     }
 }
