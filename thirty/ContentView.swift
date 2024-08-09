@@ -21,7 +21,9 @@ struct ContentView: View {
     }
 
     var body: some View {
-        TabView {
+        LoginView()
+        
+        /*TabView {
             HomeView(dataManager: dataManager)
                 .tabItem {
                     Image(systemName: "house")
@@ -43,6 +45,7 @@ struct ContentView: View {
                 }
                 .background(Color.gray.edgesIgnoringSafeArea(.all)) // ProfileView background color
         }
+        .preferredColorScheme(.light)*/
     }
 }
 
