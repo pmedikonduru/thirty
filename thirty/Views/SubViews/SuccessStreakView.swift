@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVKit
 
 struct SuccessStreakView: View {
     @ObservedObject var dataManager: DataManager
@@ -24,13 +25,19 @@ struct SuccessStreakView: View {
                 ForEach(1...30, id: \.self) { day in
                     ZStack {
                         Rectangle()
-                            .fill(day <= dataManager.streak ? Color.green : Color.lightGrey)
+                            .fill(dataManager.videos[day] != nil ? Color.green : Color.lightGrey)
                             .frame(width: 30, height: 30)
                             .cornerRadius(5)
-                        if day <= dataManager.streak {
+
+                        if dataManager.videos[day] != nil {
                             Text("\(day)")
                                 .font(.caption)
                                 .foregroundColor(.white)
+                        }
+                    }
+                    .onTapGesture {
+                        if let videoURL = dataManager.getVideoURL(for: day) {
+                            playVideo(url: videoURL)
                         }
                     }
                 }
@@ -48,5 +55,23 @@ struct SuccessStreakView: View {
                 .stroke(Color.gray, lineWidth: 1)
                 .padding(.horizontal)
         )
+        .onAppear {
+            dataManager.fetchUserData()
+        }
+    }
+
+    private func playVideo(url: URL) {
+        let player = AVPlayer(url: url)
+        let playerController = AVPlayerViewController()
+        playerController.player = player
+
+        let windowScene = UIApplication.shared.connectedScenes
+            .filter { $0.isKind(of: UIWindowScene.self) }
+            .first as? UIWindowScene
+
+        guard let scene = windowScene else { return }
+        scene.windows.first?.rootViewController?.present(playerController, animated: true) {
+            player.play()
+        }
     }
 }

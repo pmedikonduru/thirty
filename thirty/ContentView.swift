@@ -31,7 +31,7 @@ struct ContentView: View {
                     }
                     .background(Color.blue.edgesIgnoringSafeArea(.all)) // HomeView background color
 
-                JournalView(dataManager: dataManager)
+                JournalView()
                     .tabItem {
                         Image(systemName: "book")
                         Text("Journal")

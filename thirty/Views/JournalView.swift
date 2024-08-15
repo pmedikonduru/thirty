@@ -8,139 +8,69 @@
 import SwiftUI
 
 struct JournalView: View {
-    @ObservedObject var dataManager: DataManager
-    @State private var title: String = ""
-    @State private var content: String = ""
-    @State private var selectedImage: UIImage? = nil
-    @State private var userProfileImage: String = "profile_picture" // Example placeholder
-    @State private var userName: String = "John Doe" // Example placeholder
-
-    @State private var lastPostedDate = Date.distantPast // Initialize to a very old date
-    @State private var showAlert = false
-    @State private var alertContent: Alert?
-
-    func presentAlert(alert: Alert) {
-        alertContent = alert
-        showAlert = true
-    }
-
+    @State private var viewModel = JournalViewModel()
+    
     var body: some View {
-        NavigationView {
-            ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color.deepBlue, Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .ignoresSafeArea()
-
-                GeometryReader { geometry in
-                    ScrollView {
-                        VStack {
-                            Spacer()
-                            // Journal post writing form
-                            VStack {
-                                Text("Write a Journal Post")
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
-                                    .fontWeight(.bold)
-
-                                TextField("Title", text: $title)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                TextEditor(text: $content)
-                                    .frame(height: 100)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                                HStack {
-                                    Text("Date:")
-                                    Spacer()
-                                    Text(Date(), style: .date)
-                                }
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-
-                                Button(action: {
-                                    if lastPostedDate < Calendar.current.startOfDay(for: Date()) {
-                                        // No post today, allow adding a new one
-                                        dataManager.addOrUpdateJournalPost(title: title, content: content, date: Date(), image: selectedImage, userProfileImage: userProfileImage, userName: userName, isReplacement: false)
-                                        lastPostedDate = Date()
-                                        title = ""
-                                        content = ""
-                                    } else {
-                                        // Existing post today, prompt user about multiple uploads
-                                        let alert = Alert(
-                                            title: Text("Multiple Uploads Today"),
-                                            message: Text("You've already uploaded posts today. Uploading again will replace the existing one. Are you sure you want to continue?"),
-                                            primaryButton: .destructive(Text("Continue")) {
-                                                // Add or update the post (same logic as before) with isReplacement = true
-                                                dataManager.addOrUpdateJournalPost(title: title, content: content, date: Date(), image: selectedImage, userProfileImage: userProfileImage, userName: userName, isReplacement: true)
-                                                lastPostedDate = Date()
-                                                title = ""
-                                                content = ""
-                                            },
-                                            secondaryButton: .cancel() {
-                                                // Clear text fields when cancel is pressed
-                                                title = ""
-                                                content = ""
-                                            }
-                                        )
-                                        presentAlert(alert: alert)
-                                    }
-                                }) {
-                                    Text("Upload")
-                                        .padding()
-                                        .background(Color.blue)
-                                        .foregroundColor(.white)
-                                        .fontWeight(.bold)
-                                        .cornerRadius(8)
-                                }
-                            }
+        ZStack {
+            // Full-screen camera preview
+            CameraView(image: $viewModel.currentFrame)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                HStack {
+                    // Camera switch button
+                    Button(action: {
+                        viewModel.switchCamera()
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath.camera")
+                            .font(.largeTitle)
                             .padding()
-                            .background(Color.white.opacity(0.2))
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
-
-                            // Display Journal Posts
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))]) {
-                                ForEach(dataManager.journalPosts) { post in
-                                    NavigationLink(destination: JournalPostView(
-                                        title: post.title,
-                                        slides: post.slides,
-                                        userProfileImage: post.userProfileImage,
-                                        userName: post.userName,
-                                        postDate: post.date.formatted(.dateTime.day().month(.wide).year())
-                                    )) {
-                                        VStack(alignment: .leading) {
-                                            Text(post.title)
-                                                .font(.headline)
-                                                .foregroundColor(.white)
-                                            Text(post.date.formatted(.dateTime.day().month(.wide).year()))
-                                                .font(.caption)
-                                                .foregroundColor(.white)
-                                            Text(String(post.content.prefix(10))) // Show only the first 10 characters
-                                                .font(.body)
-                                                .foregroundColor(.white)
-                                                .lineLimit(2)
-                                        }
-                                        .padding()
-                                        .background(Color.white.opacity(0.2))
-                                        .cornerRadius(10)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 20)
-
-                            Spacer()
-                        }
-                        .frame(maxHeight: geometry.size.height) // Ensure VStack does not exceed available height
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                            .foregroundColor(.white)
+                    }
+                    .padding(.leading, 20)
+                    
+                    Spacer()
+                    
+                    // Recording timer
+                    if viewModel.isRecording {
+                        Text(viewModel.recordingDurationString)
+                            .font(.headline)
+                            .padding()
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Capsule())
+                            .foregroundColor(.white)
+                            .padding(.trailing, 20)
                     }
                 }
-            }
-            .alert(isPresented: $showAlert) {
-                alertContent ?? Alert(title: Text("Error"), message: Text("Unknown error"), dismissButton: .default(Text("OK")))
+                
+                Spacer()
+                
+                // Recording button positioned at the bottom center
+                Button(action: {
+                    viewModel.toggleRecording(for: getCurrentDay())
+                }) {
+                    Circle()
+                        .fill(viewModel.isRecording ? Color.red : Color.white)
+                        .frame(width: 70, height: 70)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 5)
+                                .frame(width: 90, height: 90)
+                        )
+                }
+                .padding(.bottom, 50)
             }
         }
+    }
+
+    private func getCurrentDay() -> Int {
+        let calendar = Calendar.current
+        return calendar.component(.day, from: Date())
     }
 }
 
 #Preview {
-    JournalView(dataManager: DataManager()) // Pass an instance of DataManager
+    JournalView()
 }
